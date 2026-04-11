@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+english_study.egg-info/
