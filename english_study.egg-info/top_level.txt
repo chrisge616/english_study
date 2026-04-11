@@ -1,0 +1,6 @@
+app
+domain
+ingest
+interfaces
+services
+storage

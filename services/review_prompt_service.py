@@ -1,0 +1,113 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from app.config import REVIEW_PROMPT_PATH
+from services.review_plan_service import build_review_plan_text
+
+
+def build_review_prompt_text() -> str:
+    plan = build_review_plan_text()
+
+    return f"""請開始我的英文 review session。
+
+下面是今天的 Review Plan。請先根據這份內容開始測驗。
+
+{plan}
+
+---
+
+你現在是我的 English learning coach。
+
+請嚴格遵守以下規則：
+
+1. Ask ONE question at a time
+2. Wait for my answer
+3. Structure:
+   - Step 1 — Recall
+   - Step 2 — Usage
+   - Step 3 — Concept
+4. After each answer:
+   - Correct grammar
+   - Improve sentence
+   - Show natural version
+5. Adjust difficulty based on my response
+6. Be strict but helpful
+7. At the end:
+   - List weak words
+   - Identify patterns
+
+開始時請直接從 Step 1 的第一題開始，不要先解釋流程。
+
+---
+
+當我最後輸入：FINISH_REVIEW
+
+請改為輸出 ONLY Markdown，並根據今天整段 review session 生成一份 Daily Review Log，格式必須嚴格如下：
+
+# 📅 [DATE] Review
+
+#tags: #english #review
+
+---
+
+## 🔥 Today Focus
+
+---
+
+## 🧪 Test Summary
+
+### Recall
+
+### Usage
+
+### Concept
+
+---
+
+## ❗ Weak Words
+
+- mark with WEAK or STABLE when appropriate
+
+---
+
+## 📊 Recall Status
+
+|Word|Status|
+|---|---|
+
+---
+
+## 🧠 Pattern Mistakes
+
+---
+
+## 🎯 Next Action
+
+---
+
+## 📊 Status Update
+
+| Word | Result | New Status | Streak |
+|------|--------|------------|--------|
+
+狀態規則：
+- wrong -> WEAK, streak = 0
+- NEW correct -> STABLE
+- WEAK correct -> STABLE
+- STABLE after enough correct -> STRONG
+- STRONG after enough correct -> ARCHIVED
+
+Rules:
+- Keep concise
+- Focus on weaknesses
+- Use clear Markdown
+- Output ONLY Markdown
+"""
+
+
+def write_review_prompt_file(text: str, path: Path | None = None) -> Path:
+    target = path or REVIEW_PROMPT_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text, encoding="utf-8")
+    return target

@@ -1,0 +1,2 @@
+[console_scripts]
+study = app.cli:main

@@ -1,0 +1,348 @@
+# English Study System
+
+A local English learning system built around:
+
+- **Obsidian** as the human workspace
+- **Python CLI** as the formal operation layer
+- **SQLite** as the single source of truth for learning state
+- **ChatGPT** as the daily/review interaction engine
+
+The repository is currently at **Gen2 Core v0.1**.
+
+---
+
+## 1. Current Position
+
+Gen2 Core is already implemented and usable.
+
+The current priority is **not** adding new core behavior. The current priority is:
+
+1. stabilize Gen2
+2. formalize documentation
+3. use the system in real daily/review cycles
+4. plan Gen2.1
+5. design the minimal entry to Gen3
+
+---
+
+## 2. What Gen2 Already Does
+
+Gen2 currently supports:
+
+- ingesting daily learning logs into SQLite
+- ingesting review result logs into SQLite
+- updating word state through centralized policy
+- selecting review items through a due-based scheduler
+- inspecting full state and individual words
+- generating output files for daily and review workflows
+
+### Current generated outputs
+
+The system writes to `output/`:
+
+- `daily_prompt.md`
+- `review_plan.md`
+- `review_prompt.md`
+- `review_result_template.md`
+
+---
+
+## 3. Core Design Principles
+
+The current architecture follows these rules:
+
+1. **Markdown is an interface, not the database**
+2. **SQLite is the formal storage layer**
+3. **Evidence is the internal core**
+4. **Status is a summary layer**
+5. **Policy is centralized**
+6. **Scheduler is centralized**
+7. **CLI is the formal entrypoint**
+
+---
+
+## 4. Project Layout
+
+At a high level, the repository is organized like this:
+
+```text
+english_study/
+├─ app/                 # CLI entrypoint, config, runtime paths
+├─ domain/              # policy, scheduler, models, scoring, enums
+├─ ingest/              # daily/review parsers and machine-block helpers
+├─ interfaces/          # clipboard / export helpers
+├─ services/            # workflow services for ingest, inspect, prompts, plans
+├─ storage/             # SQLite connection, migrations, repositories
+├─ tests/               # automated tests
+├─ logs/
+│  ├─ daily/            # daily learning logs to ingest
+│  └─ review/           # review result logs to ingest
+├─ output/              # generated prompts, plans, templates
+├─ data/
+│  └─ study.db          # SQLite database
+├─ README.md
+├─ USER_GUIDE.md
+├─ LEGACY_NOTE.md
+└─ pyproject.toml
+```
+
+---
+
+## 5. Environment and Installation
+
+### Requirements
+
+- Python **3.11+**
+- Local filesystem access
+- Obsidian workspace for logs and generated markdown files
+
+### Install
+
+From the project root:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e .
+```
+
+After installation, the formal CLI command is:
+
+```powershell
+study --help
+```
+
+---
+
+## 6. Formal CLI Entrypoints
+
+The official command surface is the `study` CLI.
+
+### Database
+
+```powershell
+study init-db
+```
+
+### Ingest
+
+```powershell
+study ingest daily <file>
+study ingest review <file>
+```
+
+### Inspect
+
+```powershell
+study inspect state
+study inspect word <word>
+```
+
+Useful inspection examples:
+
+```powershell
+study inspect state --status WEAK --limit 15
+study inspect state --status STABLE --sort alpha
+study inspect word nuance
+```
+
+### Prepare outputs
+
+```powershell
+study prepare daily
+study prepare review
+study prepare review-prompt
+study prepare review-template
+```
+
+### Integrated workflow commands
+
+```powershell
+study run daily
+study run review
+```
+
+Older Gen1 or transition-era scripts should not be treated as the formal workflow anymore.
+
+---
+
+## 7. Daily Workflow
+
+### Step 1
+
+Generate the daily prompt:
+
+```powershell
+study prepare daily
+```
+
+This writes:
+
+- `output/daily_prompt.md`
+
+### Step 2
+
+Use `output/daily_prompt.md` with ChatGPT to generate a daily learning log.
+
+### Step 3
+
+Save the generated log under:
+
+- `logs/daily/`
+
+### Step 4
+
+Ingest the daily log:
+
+```powershell
+study ingest daily "<path-to-daily-log>"
+```
+
+---
+
+## 8. Review Workflow
+
+### Step 1
+
+Generate review materials:
+
+```powershell
+study run review
+```
+
+This writes:
+
+- `output/review_plan.md`
+- `output/review_prompt.md`
+- `output/review_result_template.md`
+
+### Step 2
+
+Use `output/review_prompt.md` to run the review session in ChatGPT.
+
+### Step 3
+
+Fill in `output/review_result_template.md`.
+
+### Step 4
+
+Save the completed review log under:
+
+- `logs/review/`
+
+### Step 5
+
+Ingest the review log:
+
+```powershell
+study ingest review "<path-to-review-log>"
+```
+
+---
+
+## 9. Current Verified Baseline
+
+The following behaviors are the current Gen2 operational baseline:
+
+- `wrong -> WEAK`
+- `correct -> STABLE`
+- `partial -> WEAK but with slight progress`
+- high-risk `WEAK` items can be pulled back earlier
+- recently reviewed `STABLE` items are not immediately pulled back in
+- repeated ingest with the same `session_id` is skipped
+
+### Known verification words
+
+These are useful spot checks for the current baseline:
+
+- `nuance` -> `WEAK`
+- `advance` -> `STABLE`
+- `reconstitute` -> `WEAK` with slight progress retained
+
+---
+
+## 10. Frozen Modules
+
+The following modules are currently frozen and should not be changed unless there is an explicit reason:
+
+- `domain/policy.py`
+- `domain/scheduler.py`
+- `services/ingest_service.py`
+- `storage/session_repo.py`
+
+This freeze boundary is part of Gen2 stabilization.
+
+---
+
+## 11. Smoke-Test Sample Files
+
+The current smoke-test sample set is:
+
+- `logs/daily/2026-04-07_gen2.md`
+- `logs/daily/2026-04-08_gen2.md`
+- `logs/daily/2026-04-10_gen2.md`
+- `logs/review/2026-04-10_review.md`
+
+These files are the current reference set for rebuilding and checking the Gen2 baseline.
+
+---
+
+## 12. Validation Status
+
+The repository contains an automated `tests/` directory and a smoke-test sample workflow.
+
+At the current stabilization stage:
+
+- the **daily/review smoke workflow** is the main operational validation path
+- the **frozen Gen2 behavior** is the source of truth for expected system behavior
+- documentation and verification are still being tightened
+
+This means the project should currently be treated as **operationally usable, but still under stabilization**.
+
+---
+
+## 13. Current Non-Goals
+
+Do not prioritize these right now:
+
+- redesigning policy
+- redesigning the scheduler
+- rewriting ingest dedup behavior
+- expanding core learning logic
+- implementing Gen3
+- implementing Gen4
+
+The correct focus is Gen2 stabilization, documentation, and real usage.
+
+---
+
+## 14. Recommended Operating Order
+
+For normal use, the recommended order is:
+
+1. initialize the database if needed
+2. run daily workflow
+3. ingest the daily log
+4. run review workflow
+5. ingest the review log
+6. inspect state when needed
+7. accumulate real learning data before changing the core
+
+---
+
+## 15. Related Documents
+
+- `USER_GUIDE.md` — step-by-step operating guide
+- `REBUILD_AND_SMOKE.md` — clean rebuild and validation procedure
+- `LEGACY_NOTE.md` — historical context for older tooling
+
+---
+
+## 16. Status Summary
+
+- **Current generation:** Gen2 Core v0.1
+- **Current mode:** stabilization and documentation
+- **Formal entrypoint:** `study` CLI
+- **Formal storage:** SQLite
+- **Human workspace:** Obsidian
+- **Interaction engine:** ChatGPT
