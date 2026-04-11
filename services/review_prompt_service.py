@@ -43,7 +43,7 @@ def build_review_prompt_text() -> str:
 
 當我最後輸入：FINISH_REVIEW
 
-請改為輸出 ONLY Markdown，並根據今天整段 review session 生成一份 Daily Review Log，格式必須嚴格如下：
+請改為輸出 ONLY Markdown，並根據今天整段 review session 生成一份 Review Result，格式必須對齊目前的 review result template v2。
 
 # 📅 [DATE] Review
 
@@ -51,52 +51,84 @@ def build_review_prompt_text() -> str:
 
 ---
 
-## 🔥 Today Focus
+Session Date: [DATE]
+Session ID: [DATE]-review-template
+Generated From: `output/review_plan.md`
+
+This file records the outcome of a review session.
+
+Please fill the human-editable sections normally.
+Keep the machine section at the bottom structurally valid.
 
 ---
 
-## 🧪 Test Summary
+## HUMAN-EDITABLE SECTION
 
-### Recall
+### 1. Recall Summary
 
-### Usage
+### 2. Usage Summary
 
-### Concept
+### 3. Concept / Nuance Summary
 
----
+### 4. Weak Words
 
-## ❗ Weak Words
+### 5. Pattern Mistakes
 
-- mark with WEAK or STABLE when appropriate
-
----
-
-## 📊 Recall Status
-
-|Word|Status|
-|---|---|
+### 6. Next Action
 
 ---
 
-## 🧠 Pattern Mistakes
+## STATUS UPDATE TABLE
+
+| Word | Result | Confidence | Notes | Suggested Follow-up |
+|------|--------|------------|-------|---------------------|
+
+Rules:
+- `Result` must stay one of: `correct`, `partial`, `wrong`
+- Do not invent new result values
+- Keep confidence, notes, and follow-up short and human-readable
+- Do not treat derived status or streak as an editable authority field
 
 ---
 
-## 🎯 Next Action
+## MACHINE SECTION - DO NOT EDIT STRUCTURE
+
+You may update result values if needed.
+Do not delete keys.
+Do not add prose inside the JSON.
+Do not change quote style.
+Do not convert this block into rich formatting.
+
+<!-- STUDY_SESSION_DATA
+{{
+  "session_id": "[DATE]-review-template",
+  "session_type": "review",
+  "source_file": "logs/review/[DATE]_review.md",
+  "created_at": "[DATE]T21:00:00",
+  "items": [
+    {{"word": "[word]", "task_type": "", "result": ""}}
+  ],
+  "pattern_notes": []
+}}
+-->
 
 ---
 
-## 📊 Status Update
+## FINAL CHECK BEFORE INGEST
 
-| Word | Result | New Status | Streak |
-|------|--------|------------|--------|
+Confirm the following:
 
-狀態規則：
-- wrong -> WEAK, streak = 0
-- NEW correct -> STABLE
-- WEAK correct -> STABLE
-- STABLE after enough correct -> STRONG
-- STRONG after enough correct -> ARCHIVED
+- the human-editable section is complete enough to keep as a review record
+- the status table uses valid `Result` values
+- the machine block is still valid JSON
+- the session id is correct
+- the file is saved under `logs/review/`
+
+Example ingest command:
+
+```powershell
+study ingest review ".\\logs\\review\\YYYY-MM-DD_review.md"
+```
 
 Rules:
 - Keep concise
