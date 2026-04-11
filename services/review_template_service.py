@@ -45,7 +45,7 @@ def build_review_result_template_text() -> str:
     words = _extract_selected_words(plan_text)
 
     status_rows = "\n".join(
-        f"| {word} |  |  |  |" for word in words
+        f"| {word} |  |  |  |  |" for word in words
     )
 
     item_rows = ",\n    ".join(
@@ -58,51 +58,93 @@ def build_review_result_template_text() -> str:
 
 ---
 
-## 🔥 Today Focus
+Session Date: {review_date}
+Session ID: {review_date}-review-template
+Generated From: `output/review_plan.md`
 
-- Fill in results after your review session
-- Use: correct / partial / wrong
-- Keep notes brief and concrete
+This file records the outcome of a review session.
 
----
-
-## 🧪 Test Summary
-
-### Recall
-
-### Usage
-
-### Concept
+Please fill the human-editable sections normally.
+Keep the machine section at the bottom structurally valid.
 
 ---
 
-## ❗ Weak Words
+## HUMAN-EDITABLE SECTION
 
-- mark with WEAK or STABLE when appropriate
+### 1. Recall Summary
 
----
+- What was recalled well?
+- Which words were remembered only vaguely?
+- Which words were missed?
 
-## 📊 Recall Status
+### 2. Usage Summary
 
-|Word|Status|
-|---|---|
-{"".join(f"| {word} |  |\n" for word in words[:4])}
-
----
-
-## 🧠 Pattern Mistakes
+- Which words were used correctly in examples?
+- Which words showed weak usage control?
+- Which words were recognized but not actively usable?
 
 ---
 
-## 🎯 Next Action
+### 3. Concept / Nuance Summary
+
+- Which words were conceptually clear?
+- Which words were confused with nearby meanings?
+- Which nuance gaps appeared during review?
 
 ---
 
-## 📊 Status Update
+### 4. Weak Words
 
-| Word | Result | New Status | Streak |
-|------|--------|------------|--------|
+- [word]
+- [word]
+- [word]
+
+---
+
+### 5. Pattern Mistakes
+
+#### Pattern 1
+- Pattern:
+- Affected words:
+- What went wrong:
+- Suggested fix:
+
+#### Pattern 2
+- Pattern:
+- Affected words:
+- What went wrong:
+- Suggested fix:
+
+---
+
+### 6. Next Action
+
+- What should be reinforced next?
+- Which words need early review?
+- Which words may be stable enough to leave alone for now?
+
+---
+
+## STATUS UPDATE TABLE
+
+| Word | Result | Confidence | Notes | Suggested Follow-up |
+|------|--------|------------|-------|---------------------|
 {status_rows}
+
+Rules:
+- `Result` should stay one of: `correct`, `partial`, `wrong`
+- Keep notes short and concrete
+- Use follow-up only for actionable next steps
+
+---
+
+## MACHINE SECTION - DO NOT EDIT STRUCTURE
+
+You may update result values if needed.
+Do not delete keys.
+Do not add prose inside the JSON.
+Do not change quote style.
+Do not convert this block into rich formatting.
 
 <!-- STUDY_SESSION_DATA
 {{
@@ -116,6 +158,24 @@ def build_review_result_template_text() -> str:
   "pattern_notes": []
 }}
 -->
+
+---
+
+## FINAL CHECK BEFORE INGEST
+
+Confirm the following:
+
+- the human-editable section is complete enough to keep as a review record
+- the status table uses valid `Result` values
+- the machine block is still valid JSON
+- the session id is correct
+- the file is saved under `logs/review/`
+
+Example ingest command:
+
+```powershell
+study ingest review ".\\logs\\review\\YYYY-MM-DD_review.md"
+```
 """
 
 

@@ -190,6 +190,15 @@ Fill in the human-readable sections such as:
 - next action
 - status update table
 
+The generated review result template now separates:
+
+- `HUMAN-EDITABLE SECTION`
+- `STATUS UPDATE TABLE`
+- `MACHINE SECTION - DO NOT EDIT STRUCTURE`
+
+Treat the human-editable section and the status update table as your normal notes area.
+The machine section remains the ingest-critical structure.
+
 ### Step 4 — Keep the machine block valid
 
 At the bottom of the review result template there is a machine-readable block inside:
