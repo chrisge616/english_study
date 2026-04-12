@@ -7,6 +7,8 @@ from app.config import ROOT
 from app.paths import ensure_runtime_dirs
 from application.path_context import PathContext
 from application.results import ActionResult
+from infrastructure.path_resolver import build_sync_paths
+from infrastructure.sync_bridge import OutputSyncBridge
 from services.daily_prompt_service import build_daily_prompt_text, write_daily_prompt_file
 from services.ingest_service import ingest_daily_file, ingest_review_file
 from services.review_plan_service import build_review_plan_text, write_review_plan_file
@@ -63,6 +65,29 @@ class EasyModeFacade:
             message="Current paths loaded successfully.",
             files=[],
             details=self.path_context.to_dict(),
+        )
+
+    def sync_to_obsidian(self) -> ActionResult:
+        ensure_runtime_dirs()
+
+        try:
+            sync_paths = build_sync_paths(self.path_context)
+            result = OutputSyncBridge(sync_paths).sync_output_to_obsidian()
+        except OSError as exc:
+            return ActionResult(
+                ok=False,
+                action="sync_to_obsidian",
+                message="Could not sync output files to the notes workspace.",
+                files=[],
+                details={"error": str(exc)},
+            )
+
+        return ActionResult(
+            ok=True,
+            action="sync_to_obsidian",
+            message="Output files synced successfully.",
+            files=result["copied_files"],
+            details={"destination_root": result["destination_root"]},
         )
 
     def ingest_daily_log(self, path: str) -> ActionResult:
