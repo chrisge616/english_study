@@ -33,7 +33,8 @@ def create_app(*, facade: EasyModeFacade | None = None):
             body = environ["wsgi.input"].read(content_length).decode("utf-8")
             params = parse_qs(body)
             action_name = params.get("action", [""])[0]
-            result = dispatch_action(active_facade, action_name)
+            path_value = params.get("path", [""])[0]
+            result = dispatch_action(active_facade, action_name, path=path_value)
             return _respond_ok(start_response, template, result)
 
         start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])

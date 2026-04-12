@@ -4,11 +4,13 @@ from application.facade import EasyModeFacade
 from application.results import ActionResult
 
 
-def dispatch_action(facade: EasyModeFacade, action_name: str) -> ActionResult:
+def dispatch_action(facade: EasyModeFacade, action_name: str, *, path: str = "") -> ActionResult:
     actions = {
         "generate_daily_prompt": facade.generate_daily_prompt,
         "generate_review_pack": facade.generate_review_pack,
         "get_current_paths": facade.get_current_paths,
+        "ingest_daily_log": lambda: facade.ingest_daily_log(path),
+        "ingest_review_log": lambda: facade.ingest_review_log(path),
     }
 
     action = actions.get(action_name)

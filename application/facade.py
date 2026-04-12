@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from app.config import ROOT
@@ -7,6 +8,7 @@ from app.paths import ensure_runtime_dirs
 from application.path_context import PathContext
 from application.results import ActionResult
 from services.daily_prompt_service import build_daily_prompt_text, write_daily_prompt_file
+from services.ingest_service import ingest_daily_file, ingest_review_file
 from services.review_plan_service import build_review_plan_text, write_review_plan_file
 from services.review_prompt_service import build_review_prompt_text, write_review_prompt_file
 from services.review_template_service import (
@@ -61,6 +63,80 @@ class EasyModeFacade:
             message="Current paths loaded successfully.",
             files=[],
             details=self.path_context.to_dict(),
+        )
+
+    def ingest_daily_log(self, path: str) -> ActionResult:
+        return self._ingest_log(path=path, action="ingest_daily_log", ingest_fn=ingest_daily_file)
+
+    def ingest_review_log(self, path: str) -> ActionResult:
+        return self._ingest_log(path=path, action="ingest_review_log", ingest_fn=ingest_review_file)
+
+    def _ingest_log(self, *, path: str, action: str, ingest_fn) -> ActionResult:
+        ensure_runtime_dirs()
+
+        raw_path = (path or "").strip()
+        if not raw_path:
+            return ActionResult(
+                ok=False,
+                action=action,
+                message="Could not find the selected markdown file.",
+                files=[],
+                details={"path": raw_path},
+            )
+
+        target = Path(raw_path).expanduser()
+        if not target.exists():
+            return ActionResult(
+                ok=False,
+                action=action,
+                message="Could not find the selected markdown file.",
+                files=[raw_path],
+                details={"path": raw_path},
+            )
+
+        try:
+            result = ingest_fn(target)
+        except json.JSONDecodeError as exc:
+            return ActionResult(
+                ok=False,
+                action=action,
+                message="The file contains a machine block, but its JSON is not valid.",
+                files=[self._to_relative_path(target)],
+                details={"path": str(target), "error": str(exc)},
+            )
+        except FileNotFoundError:
+            return ActionResult(
+                ok=False,
+                action=action,
+                message="Could not find the selected markdown file.",
+                files=[raw_path],
+                details={"path": raw_path},
+            )
+
+        return self._build_ingest_result(action=action, path=target, result=result)
+
+    def _build_ingest_result(self, *, action: str, path: Path, result: dict) -> ActionResult:
+        if result.get("skipped") and result.get("reason") == "session already exists":
+            return ActionResult(
+                ok=False,
+                action=action,
+                message="This log appears to have already been imported.",
+                files=[self._to_relative_path(path)],
+                details={"session_id": result.get("session_id")},
+            )
+
+        label = "Daily log imported successfully." if action == "ingest_daily_log" else "Review result imported successfully."
+        details = {
+            "session_id": result.get("session_id"),
+            "processed": result.get("processed"),
+        }
+
+        return ActionResult(
+            ok=True,
+            action=action,
+            message=label,
+            files=[self._to_relative_path(path)],
+            details=details,
         )
 
     def _to_relative_path(self, path: Path) -> str:

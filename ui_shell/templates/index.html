@@ -21,6 +21,18 @@
       <button type="submit" name="action" value="get_current_paths">Show Current Paths</button>
     </form>
 
+    <form method="post" action="/action">
+      <label for="daily-log-path">Ingest Daily Log</label>
+      <input id="daily-log-path" type="text" name="path" placeholder="logs/daily/2026-04-11_gen2.md">
+      <button type="submit" name="action" value="ingest_daily_log">Ingest Daily Log</button>
+    </form>
+
+    <form method="post" action="/action">
+      <label for="review-log-path">Ingest Review Result</label>
+      <input id="review-log-path" type="text" name="path" placeholder="logs/review/2026-04-11_review.md">
+      <button type="submit" name="action" value="ingest_review_log">Ingest Review Result</button>
+    </form>
+
     $result_panel
   </main>
 </body>
