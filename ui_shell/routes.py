@@ -9,6 +9,7 @@ def dispatch_action(facade: EasyModeFacade, action_name: str, *, path: str = "")
         "generate_daily_prompt": facade.generate_daily_prompt,
         "generate_review_pack": facade.generate_review_pack,
         "get_current_paths": facade.get_current_paths,
+        "sync_to_obsidian": facade.sync_to_obsidian,
         "ingest_daily_log": lambda: facade.ingest_daily_log(path),
         "ingest_review_log": lambda: facade.ingest_review_log(path),
     }
