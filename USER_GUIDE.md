@@ -381,12 +381,14 @@ Check:
 Check:
 
 - the daily markdown actually contains `- Word:` lines
+- if a `<!-- STUDY_SESSION_DATA ... -->` block is present, its JSON is valid and not left as empty placeholder data
 - the file path points to the intended log
 - the same file was not already ingested under the same session id
 
 Remember:
 
 - daily ingest uses the filename stem to form the fallback `session_id`
+- when a daily machine block exists, ingest prefers that structured data
 - repeated ingest of the same session is intentionally skipped
 
 ### Issue 3 — Review ingest processed 0 items or missed results
