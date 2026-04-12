@@ -1,0 +1,33 @@
+from __future__ import annotations
+
+from application.facade import EasyModeFacade
+from application.results import ActionResult
+
+
+def dispatch_action(facade: EasyModeFacade, action_name: str) -> ActionResult:
+    actions = {
+        "generate_daily_prompt": facade.generate_daily_prompt,
+        "generate_review_pack": facade.generate_review_pack,
+        "get_current_paths": facade.get_current_paths,
+    }
+
+    action = actions.get(action_name)
+    if action is None:
+        return ActionResult(
+            ok=False,
+            action=action_name or "unknown",
+            message="Unknown action.",
+            files=[],
+            details=None,
+        )
+
+    try:
+        return action()
+    except Exception as exc:
+        return ActionResult(
+            ok=False,
+            action=action_name,
+            message="The study engine could not complete the action.",
+            files=[],
+            details={"error": str(exc)},
+        )
