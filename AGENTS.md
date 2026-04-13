@@ -38,17 +38,24 @@ Preserve these behaviors:
 - repeated ingest with the same `session_id` should be skipped
 
 ### Current priority
-The next implementation priority is Gen2.1 template/interface work:
-1. `review_result_template.md` v2
-2. `review_prompt.md` v2
-3. `daily_prompt.md` v2
-4. optional `daily_result_template.md`
+The current implementation priority is Easy Mode usability and safe productization:
+1. startup reliability
+2. UI step reduction
+3. once startup succeeds, remaining routine actions should happen in the UI as much as possible
+4. do not expand core learning logic unless explicitly instructed
 
 ### Change discipline
 - Prefer service-layer and template-layer changes over core logic changes.
 - Keep diffs minimal.
 - If smoke workflow passes but a scheduler test fails, treat it as a test-alignment issue first.
 - Update docs when behavior or workflow wording changes.
+
+### Collaboration discipline
+- User-path changes require real-path validation before commit.
+- If two patch attempts fail on the same path, switch to read-only diagnosis before further edits.
+- Related launcher/UI hardening issues may be bundled into one bounded hardening patch when they share the same acceptance gap.
+- Level 2+ review handoff must include exact changed lines or full file content / diff.
+- Diagnostic-only changes should not be committed unless they directly solve the acceptance gap.
 
 ### Completion format
 At the end of each task, report:
