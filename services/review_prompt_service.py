@@ -9,24 +9,24 @@ from services.review_plan_service import build_review_plan_text
 def build_review_prompt_text() -> str:
     plan = build_review_plan_text()
 
-    return f"""請開始我的英文 review session。
+    return f"""??????? review session?
 
-下面是今天的 Review Plan。請先根據這份內容開始測驗。
+?????? Review Plan??????????????
 
 {plan}
 
 ---
 
-你現在是我的 English learning coach。
+?????? English learning coach?
 
-請嚴格遵守以下規則：
+??????????
 
 1. Ask ONE question at a time
 2. Wait for my answer
 3. Structure:
-   - Step 1 — Recall
-   - Step 2 — Usage
-   - Step 3 — Concept
+   - Step 1 ? Recall
+   - Step 2 ? Usage
+   - Step 3 ? Concept
 4. After each answer:
    - Correct grammar
    - Improve sentence
@@ -37,28 +37,28 @@ def build_review_prompt_text() -> str:
    - List weak words
    - Identify patterns
 
-開始時請直接從 Step 1 的第一題開始，不要先解釋流程。
+??????? Step 1 ???????????????
 
 ---
 
-當我最後輸入：FINISH_REVIEW
+???????FINISH_REVIEW
 
-請改為輸出 ONLY Markdown，並根據今天整段 review session 生成一份 Review Result，格式必須對齊目前的 review result template v2。
+????? ONLY Markdown???????? review session ????????? ingest ? Review Result????????? review result template v2???????????????????????????????
 
-# 📅 [DATE] Review
+# ?? [DATE] Review
 
 #tags: #english #review
 
 ---
 
 Session Date: [DATE]
-Session ID: [DATE]-review-template
+Session ID: [DATE]-review
 Generated From: `output/review_plan.md`
 
-This file records the outcome of a review session.
+This file records the completed outcome of a review session.
 
-Please fill the human-editable sections normally.
-Keep the machine section at the bottom structurally valid.
+Complete the human-readable sections based on the session.
+Treat the machine section at the bottom as the reliable ingest contract and keep it structurally valid.
 
 ---
 
@@ -87,12 +87,13 @@ Rules:
 - `Result` must stay one of: `correct`, `partial`, `wrong`
 - Do not invent new result values
 - Keep confidence, notes, and follow-up short and human-readable
-- Do not treat derived status or streak as an editable authority field
+- Do not treat this table as the primary ingest authority. The machine section below is the reliable ingest path
 
 ---
 
-## MACHINE SECTION - DO NOT EDIT STRUCTURE
+## MACHINE SECTION - RELIABLE INGEST CONTRACT
 
+This machine block is the reliable ingest path.
 You may update result values if needed.
 Do not delete keys.
 Do not add prose inside the JSON.
@@ -101,7 +102,7 @@ Do not convert this block into rich formatting.
 
 <!-- STUDY_SESSION_DATA
 {{
-  "session_id": "[DATE]-review-template",
+  "session_id": "[DATE]-review",
   "session_type": "review",
   "source_file": "logs/review/[DATE]_review.md",
   "created_at": "[DATE]T21:00:00",
@@ -121,6 +122,7 @@ Confirm the following:
 - the human-editable section is complete enough to keep as a review record
 - the status table uses valid `Result` values
 - the machine block is still valid JSON
+- the machine block fully reflects the final review result
 - the session id is correct
 - the file is saved under `logs/review/`
 

@@ -59,13 +59,13 @@ def build_review_result_template_text() -> str:
 ---
 
 Session Date: {review_date}
-Session ID: {review_date}-review-template
+Session ID: {review_date}-review
 Generated From: `output/review_plan.md`
 
-This file records the outcome of a review session.
+This file is a reference/fallback scaffold for a review session result.
 
-Please fill the human-editable sections normally.
-Keep the machine section at the bottom structurally valid.
+The preferred path is for ChatGPT to generate the final completed review result directly at the end of the session.
+If this template is used, complete the human-readable sections and keep the machine section at the bottom structurally valid.
 
 ---
 
@@ -135,11 +135,13 @@ Rules:
 - `Result` should stay one of: `correct`, `partial`, `wrong`
 - Keep notes short and concrete
 - Use follow-up only for actionable next steps
+- Do not rely on this table alone as the primary ingest-safe contract
 
 ---
 
-## MACHINE SECTION - DO NOT EDIT STRUCTURE
+## MACHINE SECTION - RELIABLE INGEST CONTRACT
 
+This machine block is the reliable ingest path.
 You may update result values if needed.
 Do not delete keys.
 Do not add prose inside the JSON.
@@ -148,7 +150,7 @@ Do not convert this block into rich formatting.
 
 <!-- STUDY_SESSION_DATA
 {{
-  "session_id": "{review_date}-review-template",
+  "session_id": "{review_date}-review",
   "session_type": "review",
   "source_file": "logs/review/{review_date}_review.md",
   "created_at": "{review_date}T21:00:00",
@@ -168,6 +170,7 @@ Confirm the following:
 - the human-editable section is complete enough to keep as a review record
 - the status table uses valid `Result` values
 - the machine block is still valid JSON
+- the machine block fully reflects the final review result
 - the session id is correct
 - the file is saved under `logs/review/`
 
