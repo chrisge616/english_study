@@ -26,7 +26,8 @@ class EasyModeFacade:
     def generate_daily_prompt(self) -> ActionResult:
         ensure_runtime_dirs()
 
-        output_path = write_daily_prompt_file(build_daily_prompt_text())
+        prompt_text = build_daily_prompt_text()
+        output_path = write_daily_prompt_file(prompt_text)
         relative_path = self._to_relative_path(output_path)
 
         return ActionResult(
@@ -34,7 +35,10 @@ class EasyModeFacade:
             action="generate_daily_prompt",
             message="Daily prompt generated successfully.",
             files=[relative_path],
-            details={"path_context": self.path_context.to_dict()},
+            details={
+                "path_context": self.path_context.to_dict(),
+                "prompt_text": prompt_text,
+            },
         )
 
     def generate_review_pack(self) -> ActionResult:

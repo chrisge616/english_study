@@ -55,5 +55,34 @@
 
     $result_panel
   </main>
+  <script>
+    document.addEventListener("click", async (event) => {
+      const button = event.target.closest("#copy-daily-prompt");
+      if (!button) {
+        return;
+      }
+
+      const targetId = button.getAttribute("data-copy-target");
+      const source = document.getElementById(targetId);
+      const status = document.getElementById("copy-status");
+      if (!source || !navigator.clipboard) {
+        if (status) {
+          status.textContent = "Clipboard copy is not available in this browser.";
+        }
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(source.value);
+        if (status) {
+          status.textContent = "Copied daily prompt to clipboard.";
+        }
+      } catch (error) {
+        if (status) {
+          status.textContent = "Could not copy the daily prompt.";
+        }
+      }
+    });
+  </script>
 </body>
 </html>

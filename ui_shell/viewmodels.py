@@ -16,6 +16,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
             "details": "",
             "path_items": [],
             "recent_daily_logs": [],
+            "daily_prompt_text": "",
         }
 
     details = ""
@@ -31,10 +32,14 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
         ]
 
     recent_daily_logs: list[str] = []
+    daily_prompt_text = ""
     if isinstance(result.details, dict):
         raw_recent_daily_logs = result.details.get("recent_daily_logs", [])
         if isinstance(raw_recent_daily_logs, list):
             recent_daily_logs = [str(item) for item in raw_recent_daily_logs]
+        raw_daily_prompt_text = result.details.get("prompt_text", "")
+        if isinstance(raw_daily_prompt_text, str):
+            daily_prompt_text = raw_daily_prompt_text
 
     return {
         "ok_label": "success" if result.ok else "failure",
@@ -44,6 +49,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
         "details": details,
         "path_items": path_items,
         "recent_daily_logs": recent_daily_logs,
+        "daily_prompt_text": daily_prompt_text,
     }
 
 
@@ -82,6 +88,12 @@ def render_result_html(result: ActionResult | None) -> str:
         for file_path in recent_daily_logs:
             parts.append(f"<li><code>{escape(str(file_path))}</code></li>")
         parts.append("</ul>")
+
+    daily_prompt_text = str(vm["daily_prompt_text"])
+    if daily_prompt_text:
+        parts.append("<p><strong>Daily Prompt:</strong></p>")
+        parts.append('<textarea id="daily-prompt-text" rows="16" readonly>{}</textarea>'.format(escape(daily_prompt_text)))
+        parts.append('<p><button type="button" id="copy-daily-prompt" data-copy-target="daily-prompt-text">Copy to Clipboard</button> <span id="copy-status" aria-live="polite"></span></p>')
 
     details = str(vm["details"])
     if details:
