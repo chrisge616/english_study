@@ -17,6 +17,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
             "path_items": [],
             "recent_daily_logs": [],
             "daily_prompt_text": "",
+            "review_prompt_text": "",
         }
 
     details = ""
@@ -33,6 +34,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
 
     recent_daily_logs: list[str] = []
     daily_prompt_text = ""
+    review_prompt_text = ""
     if isinstance(result.details, dict):
         raw_recent_daily_logs = result.details.get("recent_daily_logs", [])
         if isinstance(raw_recent_daily_logs, list):
@@ -40,6 +42,9 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
         raw_daily_prompt_text = result.details.get("prompt_text", "")
         if isinstance(raw_daily_prompt_text, str):
             daily_prompt_text = raw_daily_prompt_text
+        raw_review_prompt_text = result.details.get("review_prompt_text", "")
+        if isinstance(raw_review_prompt_text, str):
+            review_prompt_text = raw_review_prompt_text
 
     return {
         "ok_label": "success" if result.ok else "failure",
@@ -50,6 +55,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
         "path_items": path_items,
         "recent_daily_logs": recent_daily_logs,
         "daily_prompt_text": daily_prompt_text,
+        "review_prompt_text": review_prompt_text,
     }
 
 
@@ -93,7 +99,13 @@ def render_result_html(result: ActionResult | None) -> str:
     if daily_prompt_text:
         parts.append("<p><strong>Daily Prompt:</strong></p>")
         parts.append('<textarea id="daily-prompt-text" rows="16" readonly>{}</textarea>'.format(escape(daily_prompt_text)))
-        parts.append('<p><button type="button" id="copy-daily-prompt" data-copy-target="daily-prompt-text">Copy to Clipboard</button> <span id="copy-status" aria-live="polite"></span></p>')
+        parts.append('<p><button type="button" class="copy-to-clipboard" data-copy-target="daily-prompt-text" data-copy-success="Copied daily prompt to clipboard.">Copy to Clipboard</button> <span id="copy-status" aria-live="polite"></span></p>')
+
+    review_prompt_text = str(vm["review_prompt_text"])
+    if review_prompt_text:
+        parts.append("<p><strong>Review Prompt:</strong></p>")
+        parts.append('<textarea id="review-prompt-text" rows="16" readonly>{}</textarea>'.format(escape(review_prompt_text)))
+        parts.append('<p><button type="button" class="copy-to-clipboard" data-copy-target="review-prompt-text" data-copy-success="Copied review prompt to clipboard.">Copy to Clipboard</button> <span id="copy-status" aria-live="polite"></span></p>')
 
     details = str(vm["details"])
     if details:

@@ -57,30 +57,53 @@
   </main>
   <script>
     document.addEventListener("click", async (event) => {
-      const button = event.target.closest("#copy-daily-prompt");
+      const button = event.target.closest(".copy-to-clipboard");
       if (!button) {
         return;
       }
 
       const targetId = button.getAttribute("data-copy-target");
+      const successMessage = button.getAttribute("data-copy-success") || "Copied to clipboard.";
       const source = document.getElementById(targetId);
-      const status = document.getElementById("copy-status");
-      if (!source || !navigator.clipboard) {
+      const status = button.parentElement ? button.parentElement.querySelector('[aria-live="polite"]') : document.getElementById("copy-status");
+      if (!source) {
         if (status) {
-          status.textContent = "Clipboard copy is not available in this browser.";
+          status.textContent = "Could not find the text to copy.";
         }
         return;
       }
 
+      const selectSource = () => {
+        source.focus();
+        source.select();
+        source.setSelectionRange(0, source.value.length);
+      };
+
       try {
-        await navigator.clipboard.writeText(source.value);
-        if (status) {
-          status.textContent = "Copied daily prompt to clipboard.";
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(source.value);
+          if (status) {
+            status.textContent = successMessage;
+          }
+          return;
         }
       } catch (error) {
-        if (status) {
-          status.textContent = "Could not copy the daily prompt.";
+      }
+
+      try {
+        selectSource();
+        if (document.execCommand("copy")) {
+          if (status) {
+            status.textContent = successMessage;
+          }
+          return;
         }
+      } catch (error) {
+      }
+
+      selectSource();
+      if (status) {
+        status.textContent = "Clipboard copy was blocked. The text is selected - press Ctrl+C.";
       }
     });
   </script>

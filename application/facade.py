@@ -45,7 +45,8 @@ class EasyModeFacade:
         ensure_runtime_dirs()
 
         plan_path = write_review_plan_file(build_review_plan_text())
-        prompt_path = write_review_prompt_file(build_review_prompt_text())
+        prompt_text = build_review_prompt_text()
+        prompt_path = write_review_prompt_file(prompt_text)
         template_path = write_review_result_template_file(build_review_result_template_text())
 
         files = [
@@ -59,7 +60,10 @@ class EasyModeFacade:
             action="generate_review_pack",
             message="Review files created successfully.",
             files=files,
-            details={"path_context": self.path_context.to_dict()},
+            details={
+                "path_context": self.path_context.to_dict(),
+                "review_prompt_text": prompt_text,
+            },
         )
 
     def get_current_paths(self) -> ActionResult:
