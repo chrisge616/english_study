@@ -10,6 +10,9 @@ def dispatch_action(facade: EasyModeFacade, action_name: str, *, path: str = "")
         "generate_review_pack": facade.generate_review_pack,
         "get_current_paths": facade.get_current_paths,
         "sync_to_obsidian": facade.sync_to_obsidian,
+        "sync_daily_logs": facade.sync_daily_logs,
+        "show_recent_daily_logs": facade.show_recent_daily_logs,
+        "ingest_most_recent_daily_log": facade.ingest_most_recent_daily_log,
         "ingest_daily_log": lambda: facade.ingest_daily_log(path),
         "ingest_review_log": lambda: facade.ingest_review_log(path),
     }

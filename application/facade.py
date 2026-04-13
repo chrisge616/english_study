@@ -7,7 +7,7 @@ from app.config import ROOT
 from app.paths import ensure_runtime_dirs
 from application.path_context import PathContext
 from application.results import ActionResult
-from infrastructure.path_resolver import build_sync_paths
+from infrastructure.path_resolver import build_sync_paths, is_excluded
 from infrastructure.sync_bridge import OutputSyncBridge
 from services.daily_prompt_service import build_daily_prompt_text, write_daily_prompt_file
 from services.ingest_service import ingest_daily_file, ingest_review_file
@@ -90,14 +90,107 @@ class EasyModeFacade:
             details={"destination_root": result["destination_root"]},
         )
 
+    def sync_daily_logs(self) -> ActionResult:
+        ensure_runtime_dirs()
+
+        try:
+            sync_paths = build_sync_paths(self.path_context)
+            result = OutputSyncBridge(sync_paths).sync_daily_logs_from_obsidian()
+        except OSError as exc:
+            return ActionResult(
+                ok=False,
+                action="sync_daily_logs",
+                message="Could not sync daily logs from the notes workspace.",
+                files=[],
+                details={"error": str(exc)},
+            )
+
+        if result["conflicts"]:
+            return ActionResult(
+                ok=False,
+                action="sync_daily_logs",
+                message="Sync conflict on existing WSL log.",
+                files=result["conflicts"],
+                details=result,
+            )
+
+        all_files = result["copied_files"] + result["skipped_files"]
+        if not all_files:
+            return ActionResult(
+                ok=False,
+                action="sync_daily_logs",
+                message="No daily logs found.",
+                files=[],
+                details=result,
+            )
+
+        return ActionResult(
+            ok=True,
+            action="sync_daily_logs",
+            message="Daily logs synced successfully.",
+            files=result["copied_files"] or result["skipped_files"],
+            details=result,
+        )
+
+    def show_recent_daily_logs(self) -> ActionResult:
+        sync_result = self._sync_daily_logs_before_ingest()
+        if sync_result is not None:
+            return sync_result
+
+        recent_logs = self._get_recent_daily_logs()
+        if not recent_logs:
+            return ActionResult(
+                ok=False,
+                action="show_recent_daily_logs",
+                message="No daily logs found.",
+                files=[],
+                details={"recent_daily_logs": []},
+            )
+
+        return ActionResult(
+            ok=True,
+            action="show_recent_daily_logs",
+            message="Recent daily logs loaded successfully.",
+            files=recent_logs,
+            details={"recent_daily_logs": recent_logs},
+        )
+
+    def ingest_most_recent_daily_log(self) -> ActionResult:
+        sync_result = self._sync_daily_logs_before_ingest()
+        if sync_result is not None:
+            return sync_result
+
+        recent_logs = self._get_recent_daily_logs(limit=1)
+        if not recent_logs:
+            return ActionResult(
+                ok=False,
+                action="ingest_most_recent_daily_log",
+                message="No daily logs found.",
+                files=[],
+                details={"recent_daily_logs": []},
+            )
+
+        target = ROOT / recent_logs[0]
+        return self._ingest_log(
+            path=str(target),
+            action="ingest_daily_log",
+            ingest_fn=ingest_daily_file,
+            pre_synced=True,
+        )
+
     def ingest_daily_log(self, path: str) -> ActionResult:
         return self._ingest_log(path=path, action="ingest_daily_log", ingest_fn=ingest_daily_file)
 
     def ingest_review_log(self, path: str) -> ActionResult:
         return self._ingest_log(path=path, action="ingest_review_log", ingest_fn=ingest_review_file)
 
-    def _ingest_log(self, *, path: str, action: str, ingest_fn) -> ActionResult:
+    def _ingest_log(self, *, path: str, action: str, ingest_fn, pre_synced: bool = False) -> ActionResult:
         ensure_runtime_dirs()
+
+        if action == "ingest_daily_log" and not pre_synced:
+            sync_result = self._sync_daily_logs_before_ingest()
+            if sync_result is not None:
+                return sync_result
 
         raw_path = (path or "").strip()
         if not raw_path:
@@ -163,6 +256,26 @@ class EasyModeFacade:
             files=[self._to_relative_path(path)],
             details=details,
         )
+
+    def _sync_daily_logs_before_ingest(self) -> ActionResult | None:
+        sync_result = self.sync_daily_logs()
+        if sync_result.ok:
+            return None
+        return sync_result
+
+    def _get_recent_daily_logs(self, *, limit: int = 5) -> list[str]:
+        sync_paths = build_sync_paths(self.path_context)
+        daily_dir = sync_paths.canonical_daily_logs_dir
+        if not daily_dir.exists():
+            return []
+
+        candidates = [
+            path
+            for path in daily_dir.glob("*.md")
+            if path.is_file() and not is_excluded(path.relative_to(ROOT))
+        ]
+        recent_paths = sorted(candidates, key=lambda item: (item.stat().st_mtime, item.name), reverse=True)
+        return [self._to_relative_path(path) for path in recent_paths[:limit]]
 
     def _to_relative_path(self, path: Path) -> str:
         try:

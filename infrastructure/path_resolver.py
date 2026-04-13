@@ -26,6 +26,8 @@ class SyncPaths:
     notes_workspace_wsl: Path
     canonical_output_dir: Path
     notes_output_dir: Path
+    canonical_daily_logs_dir: Path
+    notes_daily_logs_dir: Path
 
 
 def build_sync_paths(path_context: PathContext) -> SyncPaths:
@@ -37,6 +39,8 @@ def build_sync_paths(path_context: PathContext) -> SyncPaths:
         notes_workspace_wsl=notes_workspace_wsl,
         canonical_output_dir=canonical_root / "output",
         notes_output_dir=notes_workspace_wsl / "output",
+        canonical_daily_logs_dir=canonical_root / "logs" / "daily",
+        notes_daily_logs_dir=notes_workspace_wsl / "logs" / "daily",
     )
 
 

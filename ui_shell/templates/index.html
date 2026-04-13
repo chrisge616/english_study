@@ -25,8 +25,24 @@
       <button type="submit" name="action" value="sync_to_obsidian">Sync to Obsidian</button>
     </form>
 
+    <section>
+      <h2>Daily Logs</h2>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="sync_daily_logs">Sync Daily Logs from Obsidian</button>
+      </form>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="show_recent_daily_logs">Show Recent Daily Logs</button>
+      </form>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="ingest_most_recent_daily_log">Ingest Most Recent Daily Log</button>
+      </form>
+    </section>
+
     <form method="post" action="/action">
-      <label for="daily-log-path">Ingest Daily Log</label>
+      <label for="daily-log-path">Ingest Daily Log (Fallback Path)</label>
       <input id="daily-log-path" type="text" name="path" placeholder="logs/daily/2026-04-11_gen2.md">
       <button type="submit" name="action" value="ingest_daily_log">Ingest Daily Log</button>
     </form>
