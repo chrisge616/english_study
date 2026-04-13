@@ -49,7 +49,7 @@ def _respond_ok(start_response, template: Template, result) -> list[bytes]:
     return [html.encode("utf-8")]
 
 
-def run_server(*, host: str = "127.0.0.1", port: int = 8000) -> None:
+def run_server(*, host: str = "0.0.0.0", port: int = 8000) -> None:
     app = create_app()
     with make_server(host, port, app) as httpd:
         print(f"Easy Mode UI shell running at http://{host}:{port}")
