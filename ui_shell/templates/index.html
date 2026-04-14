@@ -4,6 +4,338 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Easy Mode UI Shell</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: oklch(0.96 0.012 95);
+      --surface: oklch(0.985 0.006 95);
+      --surface-strong: oklch(0.955 0.016 85);
+      --surface-accent: oklch(0.94 0.03 210);
+      --border: oklch(0.86 0.012 90);
+      --border-strong: oklch(0.72 0.03 210);
+      --text: oklch(0.26 0.02 245);
+      --text-soft: oklch(0.46 0.015 245);
+      --accent: oklch(0.52 0.12 220);
+      --accent-strong: oklch(0.42 0.1 220);
+      --danger: oklch(0.52 0.16 28);
+      --success: oklch(0.44 0.1 155);
+      --shadow-soft: 0 22px 60px rgba(27, 40, 54, 0.08);
+      --shadow-card: 0 14px 30px rgba(27, 40, 54, 0.06);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --max-width: 1100px;
+      --font-display: "Trebuchet MS", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+      --font-body: "Aptos", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(111, 168, 220, 0.16), transparent 26%),
+        linear-gradient(180deg, oklch(0.985 0.01 95), var(--bg));
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(calc(100% - 2rem), var(--max-width));
+      margin: 0 auto;
+      padding: var(--space-7) 0 var(--space-8);
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    header,
+    main > section,
+    #result-feedback {
+      background: color-mix(in oklch, var(--surface) 92%, white 8%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    header {
+      padding: var(--space-6);
+      box-shadow: var(--shadow-soft);
+    }
+
+    h1,
+    h2,
+    h3,
+    summary,
+    button {
+      font-family: var(--font-display);
+    }
+
+    h1 {
+      margin: 0 0 var(--space-2);
+      font-size: 2.4rem;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-soft);
+      max-width: 72ch;
+    }
+
+    header p {
+      font-size: 1.05rem;
+      max-width: 52ch;
+    }
+
+    main > section {
+      padding: var(--space-5);
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    #review-workflow {
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--surface-accent) 40%, white 60%), var(--surface));
+      border-color: color-mix(in oklch, var(--border-strong) 55%, var(--border) 45%);
+      box-shadow: 0 18px 40px rgba(63, 104, 145, 0.12);
+    }
+
+    .workflow-intro {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .action-cluster {
+      display: grid;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px solid color-mix(in oklch, var(--border) 84%, white 16%);
+      background: color-mix(in oklch, var(--surface-strong) 52%, white 48%);
+    }
+
+    #review-workflow .action-cluster--primary {
+      background: color-mix(in oklch, var(--surface-accent) 68%, white 32%);
+      border-color: color-mix(in oklch, var(--border-strong) 65%, white 35%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .action-cluster--secondary {
+      background: color-mix(in oklch, var(--surface) 88%, white 12%);
+    }
+
+    .action-list {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .action-form {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .action-form--inline {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: end;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input,
+    textarea,
+    button,
+    summary {
+      font: inherit;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1px solid color-mix(in oklch, var(--border) 88%, white 12%);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 14rem;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    button:focus,
+    summary:focus {
+      outline: 3px solid color-mix(in oklch, var(--accent) 35%, white 65%);
+      outline-offset: 2px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 0.85rem 1.15rem;
+      background: color-mix(in oklch, var(--accent) 82%, white 18%);
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      justify-self: start;
+      box-shadow: 0 10px 22px rgba(31, 86, 154, 0.18);
+    }
+
+    .action-cluster--secondary button,
+    details button,
+    #workspace-advanced button,
+    .copy-to-clipboard {
+      background: color-mix(in oklch, var(--surface) 62%, var(--accent) 38%);
+      color: var(--accent-strong);
+      box-shadow: none;
+      border: 1px solid color-mix(in oklch, var(--border-strong) 40%, white 60%);
+    }
+
+    details {
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      border: 1px dashed color-mix(in oklch, var(--border) 78%, white 22%);
+      background: color-mix(in oklch, var(--surface) 82%, transparent 18%);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    details[open] {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    #workspace-advanced {
+      background: color-mix(in oklch, var(--surface) 88%, white 12%);
+    }
+
+    #result-feedback {
+      padding: var(--space-5);
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    #result-feedback > section {
+      display: grid;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      background: color-mix(in oklch, var(--surface) 92%, white 8%);
+      border: 1px solid color-mix(in oklch, var(--border) 82%, white 18%);
+    }
+
+    #result-summary {
+      background: color-mix(in oklch, var(--surface-strong) 62%, white 38%);
+    }
+
+    #result-technical {
+      background: color-mix(in oklch, var(--surface) 96%, black 4%);
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--text-soft);
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    pre,
+    code {
+      font-family: "Consolas", "Cascadia Code", "SFMono-Regular", monospace;
+      font-size: 0.94rem;
+    }
+
+    pre {
+      margin: 0;
+      padding: 1rem;
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      background: oklch(0.975 0.004 250);
+      border: 1px solid color-mix(in oklch, var(--border) 72%, white 28%);
+      color: var(--text-soft);
+    }
+
+    code {
+      color: var(--accent-strong);
+    }
+
+    [aria-live="polite"] {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    @media (min-width: 860px) {
+      .workflow-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: var(--space-5);
+        align-items: start;
+      }
+
+      #result-feedback {
+        grid-template-columns: 1fr 1.2fr;
+      }
+
+      #result-technical {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      main {
+        width: min(calc(100% - 1rem), var(--max-width));
+        padding-top: var(--space-5);
+      }
+
+      header,
+      main > section,
+      #result-feedback {
+        padding: var(--space-4);
+      }
+
+      button {
+        width: 100%;
+        justify-self: stretch;
+      }
+    }
+  </style>
 </head>
 <body>
   <main>
@@ -12,38 +344,44 @@
       <p>Run your daily and review workflow without terminal steps.</p>
     </header>
 
-    <section aria-labelledby="daily-workflow">
-      <h2 id="daily-workflow">Daily</h2>
-      <p>Create today's prompt, then ingest the newest daily log when it is ready.</p>
+    <section aria-labelledby="daily-workflow" id="daily-workflow-shell">
+      <div class="workflow-intro">
+        <h2 id="daily-workflow">Daily</h2>
+        <p>Create today's prompt, then ingest the newest daily log when it is ready.</p>
+      </div>
 
-      <section aria-labelledby="daily-primary-actions">
-        <h3 id="daily-primary-actions">Primary Actions</h3>
+      <div class="workflow-grid">
+        <section aria-labelledby="daily-primary-actions" class="action-cluster action-cluster--primary">
+          <h3 id="daily-primary-actions">Primary Actions</h3>
+          <div class="action-list">
+            <form method="post" action="/action" class="action-form">
+              <button type="submit" name="action" value="generate_daily_prompt">Generate Daily Prompt</button>
+            </form>
 
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="generate_daily_prompt">Generate Daily Prompt</button>
-        </form>
+            <form method="post" action="/action" class="action-form">
+              <button type="submit" name="action" value="ingest_most_recent_daily_log">Ingest Most Recent Daily Log</button>
+            </form>
+          </div>
+        </section>
 
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="ingest_most_recent_daily_log">Ingest Most Recent Daily Log</button>
-        </form>
-      </section>
+        <section aria-labelledby="daily-secondary-actions" class="action-cluster action-cluster--secondary">
+          <h3 id="daily-secondary-actions">Secondary Actions</h3>
+          <p>After you generate a prompt, the copy action appears in the result area.</p>
+          <div class="action-list">
+            <form method="post" action="/action" class="action-form">
+              <button type="submit" name="action" value="show_recent_daily_logs">Show Recent Daily Logs</button>
+            </form>
 
-      <section aria-labelledby="daily-secondary-actions">
-        <h3 id="daily-secondary-actions">Secondary Actions</h3>
-        <p>After you generate a prompt, the copy action appears in the result area.</p>
-
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="show_recent_daily_logs">Show Recent Daily Logs</button>
-        </form>
-
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="sync_daily_logs">Sync Daily Logs from Obsidian</button>
-        </form>
-      </section>
+            <form method="post" action="/action" class="action-form">
+              <button type="submit" name="action" value="sync_daily_logs">Sync Daily Logs from Obsidian</button>
+            </form>
+          </div>
+        </section>
+      </div>
 
       <details>
         <summary>Daily Fallback / Advanced</summary>
-        <form method="post" action="/action">
+        <form method="post" action="/action" class="action-form action-form--inline">
           <label for="daily-log-path">Ingest Daily Log from a Manual Path</label>
           <input id="daily-log-path" type="text" name="path" placeholder="logs/daily/2026-04-11_gen2.md">
           <button type="submit" name="action" value="ingest_daily_log">Ingest Daily Log</button>
@@ -51,42 +389,46 @@
       </details>
     </section>
 
-    <section aria-labelledby="review-workflow">
-      <h2 id="review-workflow">Review</h2>
-      <p>Generate review materials, then paste the final review result back into Easy Mode for ingest.</p>
+    <section aria-labelledby="review-workflow" id="review-workflow-shell">
+      <div class="workflow-intro">
+        <h2 id="review-workflow">Review</h2>
+        <p>Generate review materials, then paste the final review result back into Easy Mode for ingest.</p>
+      </div>
 
-      <section aria-labelledby="review-primary-actions">
-        <h3 id="review-primary-actions">Primary Actions</h3>
+      <div class="workflow-grid">
+        <section aria-labelledby="review-primary-actions" class="action-cluster action-cluster--primary">
+          <h3 id="review-primary-actions">Primary Actions</h3>
+          <form method="post" action="/action" class="action-form">
+            <button type="submit" name="action" value="generate_review_pack">Generate Review Materials</button>
+          </form>
 
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="generate_review_pack">Generate Review Materials</button>
-        </form>
+          <form method="post" action="/action" class="action-form">
+            <label for="review-markdown">Paste Final Review Result</label>
+            <p>Paste the final markdown from ChatGPT, then ingest it directly here.</p>
+            <textarea id="review-markdown" name="review_markdown" rows="16" placeholder="# 2026-04-14 Review"></textarea>
+            <button type="submit" name="action" value="ingest_pasted_review_markdown">Paste and Ingest Review Result</button>
+          </form>
+        </section>
 
-        <form method="post" action="/action">
-          <label for="review-markdown">Paste Final Review Result</label>
-          <p>Paste the final markdown from ChatGPT, then ingest it directly here.</p>
-          <textarea id="review-markdown" name="review_markdown" rows="16" placeholder="# 2026-04-14 Review"></textarea>
-          <button type="submit" name="action" value="ingest_pasted_review_markdown">Paste and Ingest Review Result</button>
-        </form>
-      </section>
+        <section aria-labelledby="review-secondary-actions" class="action-cluster action-cluster--secondary">
+          <h3 id="review-secondary-actions">Secondary Actions</h3>
+          <p>After you generate review materials, the copy action appears in the result area.</p>
+          <div class="action-list">
+            <form method="post" action="/action" class="action-form">
+              <button type="submit" name="action" value="show_recent_review_logs">Show Recent Review Files</button>
+            </form>
 
-      <section aria-labelledby="review-secondary-actions">
-        <h3 id="review-secondary-actions">Secondary Actions</h3>
-        <p>After you generate review materials, the copy action appears in the result area.</p>
-
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="show_recent_review_logs">Show Recent Review Files</button>
-        </form>
-
-        <form method="post" action="/action">
-          <button type="submit" name="action" value="ingest_most_recent_review_log">Ingest Most Recent Review Result</button>
-        </form>
-      </section>
+            <form method="post" action="/action" class="action-form">
+              <button type="submit" name="action" value="ingest_most_recent_review_log">Ingest Most Recent Review Result</button>
+            </form>
+          </div>
+        </section>
+      </div>
 
       <details>
         <summary>Review Fallback / Advanced</summary>
         <p>Use this only when you need the file-based fallback path.</p>
-        <form method="post" action="/action">
+        <form method="post" action="/action" class="action-form action-form--inline">
           <label for="review-log-path">Ingest Review Result from a Manual Path</label>
           <input id="review-log-path" type="text" name="path" placeholder="logs/review/2026-04-11_review.md">
           <button type="submit" name="action" value="ingest_review_log">Ingest Review Result</button>
@@ -96,17 +438,23 @@
 
     $result_panel
 
-    <section aria-labelledby="workspace-advanced">
-      <h2 id="workspace-advanced">Workspace / Advanced</h2>
-      <p>Use these when you need path checks, sync help, or troubleshooting context.</p>
+    <section aria-labelledby="workspace-advanced" id="workspace-advanced-shell">
+      <div class="workflow-intro">
+        <h2 id="workspace-advanced">Workspace / Advanced</h2>
+        <p>Use these when you need path checks, sync help, or troubleshooting context.</p>
+      </div>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="sync_to_obsidian">Sync to Obsidian</button>
-      </form>
+      <div class="action-cluster action-cluster--secondary">
+        <div class="action-list">
+          <form method="post" action="/action" class="action-form">
+            <button type="submit" name="action" value="sync_to_obsidian">Sync to Obsidian</button>
+          </form>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="get_current_paths">Show Current Paths</button>
-      </form>
+          <form method="post" action="/action" class="action-form">
+            <button type="submit" name="action" value="get_current_paths">Show Current Paths</button>
+          </form>
+        </div>
+      </div>
     </section>
   </main>
   <script>
