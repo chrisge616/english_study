@@ -3,17 +3,20 @@ from __future__ import annotations
 from pathlib import Path
 
 from app.config import REVIEW_PROMPT_PATH
+from services.review_metadata_hints import build_review_metadata_hints
 from services.review_plan_service import build_review_plan_text
 
 
-def build_review_prompt_text() -> str:
+def build_review_prompt_text(*, review_logs_dir: Path | None = None) -> str:
     plan = build_review_plan_text()
+    metadata_hints = build_review_metadata_hints(plan, review_logs_dir=review_logs_dir)
 
     return f"""請開始我的英文 review session。
 
 下面是今天的 Review Plan。請先根據這份內容開始測驗。
 
 {plan}
+{metadata_hints}
 
 ---
 
