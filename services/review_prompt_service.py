@@ -27,15 +27,24 @@ def build_review_prompt_text() -> str:
    - Step 1 — Recall
    - Step 2 — Usage
    - Step 3 — Concept
-4. After each answer:
+4. Keep vocabulary mastery as the primary review goal:
+   - meaning precision
+   - usage
+   - concept boundaries
+   - confusion pairs / contrast pairs
+5. After each answer:
    - Correct grammar
    - Improve sentence
    - Show natural version
-5. Adjust difficulty based on my response
-6. Be strict but helpful
-7. At the end:
+   - Add one brief speaking or delivery note only when helpful
+6. Speaking feedback is supportive and secondary:
+   - do not treat fluency or presentation issues alone as full vocabulary failure
+7. Adjust difficulty based on my response
+8. Be strict but helpful
+9. At the end:
    - List weak words
    - Identify patterns
+   - Highlight confusion pairs or contrast pairs when useful
 
 開始時請直接從 Step 1 的第一題開始，不要先解釋流程。
 
@@ -72,9 +81,13 @@ Treat the machine section at the bottom as the reliable ingest contract and keep
 
 ### 4. Weak Words
 
-### 5. Pattern Mistakes
+### 5. Confusion / Contrast Pairs
 
-### 6. Next Action
+### 6. Pattern Mistakes
+
+### 7. Next Action
+
+### 8. Speaking / Delivery Notes (Optional)
 
 ---
 
@@ -134,7 +147,10 @@ study ingest review ".\\logs\\review\\YYYY-MM-DD_review.md"
 
 Rules:
 - Keep concise
-- Focus on weaknesses
+- Keep vocabulary mastery primary
+- Focus on weak words, confusion pairs / contrast pairs, pattern mistakes, and next actions that improve vocabulary precision and transfer
+- If you include speaking or delivery notes, keep them brief and clearly secondary
+- Do not treat fluency alone as full vocabulary failure
 - Use clear Markdown
 - Output ONLY Markdown
 """

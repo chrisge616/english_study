@@ -65,7 +65,7 @@ Generated From: `output/review_plan.md`
 This file is a reference/fallback scaffold for a review session result.
 
 The preferred path is for ChatGPT to generate the final completed review result directly at the end of the session.
-If this template is used, complete the human-readable sections and keep the machine section at the bottom structurally valid.
+If this template is used, keep vocabulary mastery primary, keep speaking or delivery notes brief and secondary, and keep the machine section at the bottom structurally valid.
 
 ---
 
@@ -89,7 +89,7 @@ If this template is used, complete the human-readable sections and keep the mach
 
 - Which words were conceptually clear?
 - Which words were confused with nearby meanings?
-- Which nuance gaps appeared during review?
+- Which nuance gaps or contrast-pair issues appeared during review?
 
 ---
 
@@ -101,7 +101,15 @@ If this template is used, complete the human-readable sections and keep the mach
 
 ---
 
-### 5. Pattern Mistakes
+### 5. Confusion / Contrast Pairs
+
+- Which pairs were confused?
+- Which near-meanings need clearer boundaries?
+- Which contrasts should be reinforced next?
+
+---
+
+### 6. Pattern Mistakes
 
 #### Pattern 1
 - Pattern:
@@ -117,11 +125,19 @@ If this template is used, complete the human-readable sections and keep the mach
 
 ---
 
-### 6. Next Action
+### 7. Next Action
 
 - What should be reinforced next?
 - Which words need early review?
-- Which words may be stable enough to leave alone for now?
+- Which next action would improve vocabulary precision or transfer?
+
+---
+
+### 8. Speaking / Delivery Notes (Optional)
+
+- Keep this section brief and secondary.
+- Use it only when speaking or delivery feedback adds learning value.
+- Do not treat fluency alone as full vocabulary failure.
 
 ---
 

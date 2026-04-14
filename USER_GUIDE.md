@@ -174,40 +174,65 @@ This writes:
 
 Use `output/review_prompt.md` as the prompt for the review session.
 
-### Step 3 — Fill in the review result template
+The review flow is vocabulary-first:
 
-Open:
+- vocabulary mastery is the primary goal
+- meaning precision, usage, concept boundaries, and confusion / contrast pairs matter most
+- grammar and natural-version feedback still appears after answers
+- speaking or delivery notes are brief and secondary when helpful
+- fluency alone should not be treated as full vocabulary failure
 
-- `output/review_result_template.md`
+### Step 3 — Finish the review and get the final result markdown
 
-Fill in the human-readable sections such as:
+When you send `FINISH_REVIEW`, ChatGPT can now output the completed ingest-ready Review Result markdown directly.
 
-- recall summary
-- usage summary
-- concept summary
+That final result should remain concise and focused on high-value learning signals such as:
+
 - weak words
+- confusion / contrast pairs
 - pattern mistakes
-- next action
-- status update table
+- next actions that improve vocabulary precision and transfer
+- optional brief speaking / delivery notes when they add value
 
-The generated review result template now separates:
+### Step 4 — Preferred path: paste and ingest in Easy Mode
 
-- `HUMAN-EDITABLE SECTION`
-- `STATUS UPDATE TABLE`
-- `MACHINE SECTION - DO NOT EDIT STRUCTURE`
+Easy Mode can ingest the final review result directly.
 
-Treat the human-editable section and the status update table as your normal notes area.
-The machine section remains the ingest-critical structure.
+Preferred path:
 
-### Step 4 — Keep the machine block valid
+- open Easy Mode
+- go to the Review Results area
+- paste the completed review result markdown into `Paste Final Review Result`
+- click `Paste and Ingest Review Result`
 
-At the bottom of the review result template there is a machine-readable block inside:
+Expected result:
+
+- the pasted review result is routed through the existing review ingest path
+- review evidence is added
+- state transitions are applied
+- duplicate session ids are safely recognized
+
+### Step 5 — Reference / fallback template
+
+`output/review_result_template.md` is now a reference / fallback scaffold, not the main workflow.
+
+Use it only when you need a structured fallback for assembling the final review result manually.
+
+If you use the template:
+
+- complete the human-readable sections
+- keep the machine block valid
+- do not rely on the status table alone as the ingest-safe contract
+
+### Step 6 — Keep the machine block valid
+
+At the bottom of the review result there is a machine-readable block inside:
 
 ```text
 <!-- STUDY_SESSION_DATA ... -->
 ```
 
-This block is important.
+This block is the reliable ingest contract.
 
 Rules:
 
@@ -218,9 +243,9 @@ Rules:
 
 If the machine block remains valid, review ingest is more reliable.
 
-### Step 5 — Save the filled review log
+### Step 7 — File-based fallback path
 
-Save the completed file into:
+If needed, you can still save the completed review result into:
 
 - `logs/review/`
 
@@ -232,19 +257,13 @@ Example:
 
 - `logs/review/2026-04-11_review.md`
 
-### Step 6 — Ingest the review log
+Then ingest it with the CLI:
 
 ```powershell
 study ingest review "C:\Users\Chris\Documents\Obsidian Vault\english_study\logs\review\2026-04-11_review.md"
 ```
 
-Expected result:
-
-- review evidence is added
-- state transitions are applied
-- streaks and due timing are updated
-
-### Step 7 — Inspect the result
+### Step 8 — Inspect the result
 
 Useful checks:
 
@@ -254,8 +273,6 @@ study inspect word nuance
 study inspect word advance
 study inspect word reconstitute
 ```
-
----
 
 ## 7. Inspection Commands
 
