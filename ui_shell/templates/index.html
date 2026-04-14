@@ -7,71 +7,107 @@
 </head>
 <body>
   <main>
-    <h1>Easy Mode UI Shell</h1>
+    <header>
+      <h1>Easy Mode</h1>
+      <p>Run your daily and review workflow without terminal steps.</p>
+    </header>
 
-    <form method="post" action="/action">
-      <button type="submit" name="action" value="generate_daily_prompt">Generate Daily Prompt</button>
-    </form>
+    <section aria-labelledby="daily-workflow">
+      <h2 id="daily-workflow">Daily</h2>
+      <p>Create today's prompt, then ingest the newest daily log when it is ready.</p>
 
-    <form method="post" action="/action">
-      <button type="submit" name="action" value="generate_review_pack">Generate Review Pack</button>
-    </form>
+      <section aria-labelledby="daily-primary-actions">
+        <h3 id="daily-primary-actions">Primary Actions</h3>
 
-    <form method="post" action="/action">
-      <button type="submit" name="action" value="get_current_paths">Show Current Paths</button>
-    </form>
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="generate_daily_prompt">Generate Daily Prompt</button>
+        </form>
 
-    <form method="post" action="/action">
-      <button type="submit" name="action" value="sync_to_obsidian">Sync to Obsidian</button>
-    </form>
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="ingest_most_recent_daily_log">Ingest Most Recent Daily Log</button>
+        </form>
+      </section>
 
-    <section>
-      <h2>Daily Logs</h2>
+      <section aria-labelledby="daily-secondary-actions">
+        <h3 id="daily-secondary-actions">Secondary Actions</h3>
+        <p>After you generate a prompt, the copy action appears in the result area.</p>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="sync_daily_logs">Sync Daily Logs from Obsidian</button>
-      </form>
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="show_recent_daily_logs">Show Recent Daily Logs</button>
+        </form>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="show_recent_daily_logs">Show Recent Daily Logs</button>
-      </form>
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="sync_daily_logs">Sync Daily Logs from Obsidian</button>
+        </form>
+      </section>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="ingest_most_recent_daily_log">Ingest Most Recent Daily Log</button>
-      </form>
+      <details>
+        <summary>Daily Fallback / Advanced</summary>
+        <form method="post" action="/action">
+          <label for="daily-log-path">Ingest Daily Log from a Manual Path</label>
+          <input id="daily-log-path" type="text" name="path" placeholder="logs/daily/2026-04-11_gen2.md">
+          <button type="submit" name="action" value="ingest_daily_log">Ingest Daily Log</button>
+        </form>
+      </details>
     </section>
 
-    <form method="post" action="/action">
-      <label for="daily-log-path">Ingest Daily Log (Fallback Path)</label>
-      <input id="daily-log-path" type="text" name="path" placeholder="logs/daily/2026-04-11_gen2.md">
-      <button type="submit" name="action" value="ingest_daily_log">Ingest Daily Log</button>
-    </form>
+    <section aria-labelledby="review-workflow">
+      <h2 id="review-workflow">Review</h2>
+      <p>Generate review materials, then paste the final review result back into Easy Mode for ingest.</p>
 
-    <section>
-      <h2>Review Results</h2>
+      <section aria-labelledby="review-primary-actions">
+        <h3 id="review-primary-actions">Primary Actions</h3>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="show_recent_review_logs">Show Recent Review Results</button>
-      </form>
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="generate_review_pack">Generate Review Materials</button>
+        </form>
 
-      <form method="post" action="/action">
-        <button type="submit" name="action" value="ingest_most_recent_review_log">Ingest Most Recent Review Result</button>
-      </form>
+        <form method="post" action="/action">
+          <label for="review-markdown">Paste Final Review Result</label>
+          <p>Paste the final markdown from ChatGPT, then ingest it directly here.</p>
+          <textarea id="review-markdown" name="review_markdown" rows="16" placeholder="# 2026-04-14 Review"></textarea>
+          <button type="submit" name="action" value="ingest_pasted_review_markdown">Paste and Ingest Review Result</button>
+        </form>
+      </section>
 
-      <form method="post" action="/action">
-        <label for="review-markdown">Paste Final Review Result</label>
-        <textarea id="review-markdown" name="review_markdown" rows="16" placeholder="# 2026-04-14 Review"></textarea>
-        <button type="submit" name="action" value="ingest_pasted_review_markdown">Paste and Ingest Review Result</button>
-      </form>
+      <section aria-labelledby="review-secondary-actions">
+        <h3 id="review-secondary-actions">Secondary Actions</h3>
+        <p>After you generate review materials, the copy action appears in the result area.</p>
+
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="show_recent_review_logs">Show Recent Review Files</button>
+        </form>
+
+        <form method="post" action="/action">
+          <button type="submit" name="action" value="ingest_most_recent_review_log">Ingest Most Recent Review Result</button>
+        </form>
+      </section>
+
+      <details>
+        <summary>Review Fallback / Advanced</summary>
+        <p>Use this only when you need the file-based fallback path.</p>
+        <form method="post" action="/action">
+          <label for="review-log-path">Ingest Review Result from a Manual Path</label>
+          <input id="review-log-path" type="text" name="path" placeholder="logs/review/2026-04-11_review.md">
+          <button type="submit" name="action" value="ingest_review_log">Ingest Review Result</button>
+        </form>
+      </details>
     </section>
-
-    <form method="post" action="/action">
-      <label for="review-log-path">Ingest Review Result (Fallback Path)</label>
-      <input id="review-log-path" type="text" name="path" placeholder="logs/review/2026-04-11_review.md">
-      <button type="submit" name="action" value="ingest_review_log">Ingest Review Result</button>
-    </form>
 
     $result_panel
+
+    <section aria-labelledby="workspace-advanced">
+      <h2 id="workspace-advanced">Workspace / Advanced</h2>
+      <p>Use these when you need path checks, sync help, or troubleshooting context.</p>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="sync_to_obsidian">Sync to Obsidian</button>
+      </form>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="get_current_paths">Show Current Paths</button>
+      </form>
+    </section>
   </main>
   <script>
     document.addEventListener("click", async (event) => {
@@ -83,7 +119,7 @@
       const targetId = button.getAttribute("data-copy-target");
       const successMessage = button.getAttribute("data-copy-success") || "Copied to clipboard.";
       const source = document.getElementById(targetId);
-      const status = button.parentElement ? button.parentElement.querySelector('[aria-live="polite"]') : document.getElementById("copy-status");
+      const status = button.parentElement ? button.parentElement.querySelector('[aria-live="polite"]') : null;
       if (!source) {
         if (status) {
           status.textContent = "Could not find the text to copy.";
