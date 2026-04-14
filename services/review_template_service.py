@@ -179,6 +179,35 @@ Do not convert this block into rich formatting.
 
 ---
 
+## OPTIONAL REVIEW METADATA - NOT USED FOR INGEST
+
+This block is optional and separate from the ingest contract.
+Use it only when transcript-derived process signals add clear learning value.
+Keep it small.
+
+<!-- STUDY_REVIEW_METADATA
+{{
+  "version": 1,
+  "session_id": "{review_date}-review",
+  "items": [
+    {{
+      "word": "[word]",
+      "task_type": "",
+      "initial_state": "",
+      "support_needed": "",
+      "recovery_level": "",
+      "confusion_with": [],
+      "best_support_mode": "",
+      "vocab_vs_fluency": ""
+    }}
+  ],
+  "recurring_confusion_pairs": [],
+  "high_value_support_patterns": []
+}}
+-->
+
+---
+
 ## FINAL CHECK BEFORE INGEST
 
 Confirm the following:

@@ -128,6 +128,36 @@ Do not convert this block into rich formatting.
 
 ---
 
+## OPTIONAL REVIEW METADATA - NOT USED FOR INGEST
+
+Use this block only if it adds clear learning value.
+Keep it small.
+Do not duplicate the main result summary.
+This block is optional and is not part of the current ingest contract.
+
+<!-- STUDY_REVIEW_METADATA
+{{
+  "version": 1,
+  "session_id": "[DATE]-review",
+  "items": [
+    {{
+      "word": "[word]",
+      "task_type": "",
+      "initial_state": "",
+      "support_needed": "",
+      "recovery_level": "",
+      "confusion_with": [],
+      "best_support_mode": "",
+      "vocab_vs_fluency": ""
+    }}
+  ],
+  "recurring_confusion_pairs": [],
+  "high_value_support_patterns": []
+}}
+-->
+
+---
+
 ## FINAL CHECK BEFORE INGEST
 
 Confirm the following:
