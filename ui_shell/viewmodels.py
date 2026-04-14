@@ -16,6 +16,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
             "details": "",
             "path_items": [],
             "recent_daily_logs": [],
+            "recent_review_logs": [],
             "daily_prompt_text": "",
             "review_prompt_text": "",
         }
@@ -33,12 +34,16 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
         ]
 
     recent_daily_logs: list[str] = []
+    recent_review_logs: list[str] = []
     daily_prompt_text = ""
     review_prompt_text = ""
     if isinstance(result.details, dict):
         raw_recent_daily_logs = result.details.get("recent_daily_logs", [])
         if isinstance(raw_recent_daily_logs, list):
             recent_daily_logs = [str(item) for item in raw_recent_daily_logs]
+        raw_recent_review_logs = result.details.get("recent_review_logs", [])
+        if isinstance(raw_recent_review_logs, list):
+            recent_review_logs = [str(item) for item in raw_recent_review_logs]
         raw_daily_prompt_text = result.details.get("prompt_text", "")
         if isinstance(raw_daily_prompt_text, str):
             daily_prompt_text = raw_daily_prompt_text
@@ -54,6 +59,7 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, str | list[
         "details": details,
         "path_items": path_items,
         "recent_daily_logs": recent_daily_logs,
+        "recent_review_logs": recent_review_logs,
         "daily_prompt_text": daily_prompt_text,
         "review_prompt_text": review_prompt_text,
     }
@@ -92,6 +98,14 @@ def render_result_html(result: ActionResult | None) -> str:
         parts.append("<p><strong>Recent Daily Logs:</strong></p>")
         parts.append("<ul>")
         for file_path in recent_daily_logs:
+            parts.append(f"<li><code>{escape(str(file_path))}</code></li>")
+        parts.append("</ul>")
+
+    recent_review_logs = vm["recent_review_logs"]
+    if recent_review_logs:
+        parts.append("<p><strong>Recent Review Results:</strong></p>")
+        parts.append("<ul>")
+        for file_path in recent_review_logs:
             parts.append(f"<li><code>{escape(str(file_path))}</code></li>")
         parts.append("</ul>")
 

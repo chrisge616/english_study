@@ -34,7 +34,8 @@ def create_app(*, facade: EasyModeFacade | None = None):
             params = parse_qs(body)
             action_name = params.get("action", [""])[0]
             path_value = params.get("path", [""])[0]
-            result = dispatch_action(active_facade, action_name, path=path_value)
+            review_markdown = params.get("review_markdown", [""])[0]
+            result = dispatch_action(active_facade, action_name, path=path_value, review_markdown=review_markdown)
             return _respond_ok(start_response, template, result)
 
         start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])

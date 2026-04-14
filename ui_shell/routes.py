@@ -4,7 +4,7 @@ from application.facade import EasyModeFacade
 from application.results import ActionResult
 
 
-def dispatch_action(facade: EasyModeFacade, action_name: str, *, path: str = "") -> ActionResult:
+def dispatch_action(facade: EasyModeFacade, action_name: str, *, path: str = "", review_markdown: str = "") -> ActionResult:
     actions = {
         "generate_daily_prompt": facade.generate_daily_prompt,
         "generate_review_pack": facade.generate_review_pack,
@@ -13,6 +13,9 @@ def dispatch_action(facade: EasyModeFacade, action_name: str, *, path: str = "")
         "sync_daily_logs": facade.sync_daily_logs,
         "show_recent_daily_logs": facade.show_recent_daily_logs,
         "ingest_most_recent_daily_log": facade.ingest_most_recent_daily_log,
+        "show_recent_review_logs": facade.show_recent_review_logs,
+        "ingest_most_recent_review_log": facade.ingest_most_recent_review_log,
+        "ingest_pasted_review_markdown": lambda: facade.ingest_pasted_review_markdown(review_markdown),
         "ingest_daily_log": lambda: facade.ingest_daily_log(path),
         "ingest_review_log": lambda: facade.ingest_review_log(path),
     }

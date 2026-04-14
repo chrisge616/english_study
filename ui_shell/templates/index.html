@@ -47,8 +47,26 @@
       <button type="submit" name="action" value="ingest_daily_log">Ingest Daily Log</button>
     </form>
 
+    <section>
+      <h2>Review Results</h2>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="show_recent_review_logs">Show Recent Review Results</button>
+      </form>
+
+      <form method="post" action="/action">
+        <button type="submit" name="action" value="ingest_most_recent_review_log">Ingest Most Recent Review Result</button>
+      </form>
+
+      <form method="post" action="/action">
+        <label for="review-markdown">Paste Final Review Result</label>
+        <textarea id="review-markdown" name="review_markdown" rows="16" placeholder="# 2026-04-14 Review"></textarea>
+        <button type="submit" name="action" value="ingest_pasted_review_markdown">Paste and Ingest Review Result</button>
+      </form>
+    </section>
+
     <form method="post" action="/action">
-      <label for="review-log-path">Ingest Review Result</label>
+      <label for="review-log-path">Ingest Review Result (Fallback Path)</label>
       <input id="review-log-path" type="text" name="path" placeholder="logs/review/2026-04-11_review.md">
       <button type="submit" name="action" value="ingest_review_log">Ingest Review Result</button>
     </form>

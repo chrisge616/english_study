@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from pathlib import Path
 
 from app.config import ROOT
@@ -186,11 +187,114 @@ class EasyModeFacade:
             pre_synced=True,
         )
 
+    def show_recent_review_logs(self) -> ActionResult:
+        recent_logs = self._get_recent_review_logs()
+        if not recent_logs:
+            return ActionResult(
+                ok=False,
+                action="show_recent_review_logs",
+                message="No review results found.",
+                files=[],
+                details={"recent_review_logs": []},
+            )
+
+        return ActionResult(
+            ok=True,
+            action="show_recent_review_logs",
+            message="Recent review results loaded successfully.",
+            files=recent_logs,
+            details={"recent_review_logs": recent_logs},
+        )
+
+    def ingest_most_recent_review_log(self) -> ActionResult:
+        recent_logs = self._get_recent_review_logs(limit=1)
+        if not recent_logs:
+            return ActionResult(
+                ok=False,
+                action="ingest_most_recent_review_log",
+                message="No review results found.",
+                files=[],
+                details={"recent_review_logs": []},
+            )
+
+        target = ROOT / recent_logs[0]
+        return self._ingest_log(
+            path=str(target),
+            action="ingest_review_log",
+            ingest_fn=ingest_review_file,
+            pre_synced=True,
+        )
+
     def ingest_daily_log(self, path: str) -> ActionResult:
         return self._ingest_log(path=path, action="ingest_daily_log", ingest_fn=ingest_daily_file)
 
     def ingest_review_log(self, path: str) -> ActionResult:
         return self._ingest_log(path=path, action="ingest_review_log", ingest_fn=ingest_review_file)
+
+    def ingest_pasted_review_markdown(self, markdown: str) -> ActionResult:
+        ensure_runtime_dirs()
+
+        raw_markdown = (markdown or "").strip()
+        if not raw_markdown:
+            return ActionResult(
+                ok=False,
+                action="ingest_pasted_review_markdown",
+                message="Paste a completed review result before ingesting.",
+                files=[],
+                details={"review_markdown": ""},
+            )
+
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix="_review.md",
+            prefix="easy_mode_",
+            dir=ROOT,
+            encoding="utf-8",
+            delete=False,
+        ) as handle:
+            handle.write(raw_markdown)
+            temp_path = Path(handle.name)
+
+        try:
+            result = ingest_review_file(temp_path)
+        except json.JSONDecodeError as exc:
+            return ActionResult(
+                ok=False,
+                action="ingest_pasted_review_markdown",
+                message="The pasted review result contains a machine block, but its JSON is not valid.",
+                files=[],
+                details={"error": str(exc)},
+            )
+        except FileNotFoundError:
+            return ActionResult(
+                ok=False,
+                action="ingest_pasted_review_markdown",
+                message="The pasted review result could not be prepared for ingest.",
+                files=[],
+                details=None,
+            )
+        finally:
+            temp_path.unlink(missing_ok=True)
+
+        if result.get("skipped") and result.get("reason") == "session already exists":
+            return ActionResult(
+                ok=False,
+                action="ingest_pasted_review_markdown",
+                message="This review result appears to have already been imported.",
+                files=[],
+                details={"session_id": result.get("session_id")},
+            )
+
+        return ActionResult(
+            ok=True,
+            action="ingest_pasted_review_markdown",
+            message="Pasted review result imported successfully.",
+            files=[],
+            details={
+                "session_id": result.get("session_id"),
+                "processed": result.get("processed"),
+            },
+        )
 
     def _ingest_log(self, *, path: str, action: str, ingest_fn, pre_synced: bool = False) -> ActionResult:
         ensure_runtime_dirs()
@@ -273,13 +377,18 @@ class EasyModeFacade:
 
     def _get_recent_daily_logs(self, *, limit: int = 5) -> list[str]:
         sync_paths = build_sync_paths(self.path_context)
-        daily_dir = sync_paths.canonical_daily_logs_dir
-        if not daily_dir.exists():
+        return self._get_recent_markdown_files(sync_paths.canonical_daily_logs_dir, limit=limit)
+
+    def _get_recent_review_logs(self, *, limit: int = 5) -> list[str]:
+        return self._get_recent_markdown_files(ROOT / "logs" / "review", limit=limit)
+
+    def _get_recent_markdown_files(self, directory: Path, *, limit: int = 5) -> list[str]:
+        if not directory.exists():
             return []
 
         candidates = [
             path
-            for path in daily_dir.glob("*.md")
+            for path in directory.glob("*.md")
             if path.is_file() and not is_excluded(path.relative_to(ROOT))
         ]
         recent_paths = sorted(candidates, key=lambda item: (item.stat().st_mtime, item.name), reverse=True)
