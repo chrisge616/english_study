@@ -1,10 +1,16 @@
+from datetime import datetime, timedelta, timezone
+
 from domain.scheduler import select_review_items
 
 
-def test_scheduler_prefers_weak():
+def test_scheduler_backfills_non_due_weak_items():
+    future_due = (datetime.now(timezone.utc) + timedelta(days=2)).isoformat()
     rows = [
-        {"display_text": "a", "status": "STABLE", "wrong_streak": 0, "memory_strength": 2.0, "due_at": None},
-        {"display_text": "b", "status": "WEAK", "wrong_streak": 1, "memory_strength": 0.0, "due_at": None},
+        {"display_text": "a", "status": "STABLE", "due_at": None},
+        {"display_text": "b", "status": "WEAK", "due_at": future_due},
     ]
+
     selected = select_review_items(rows)
-    assert selected[0]["display_text"] == "b"
+
+    assert selected[0]["display_text"] == "a"
+    assert any(item["display_text"] == "b" for item in selected)
