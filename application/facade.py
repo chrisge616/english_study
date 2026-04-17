@@ -82,6 +82,14 @@ class EasyModeFacade:
         try:
             sync_paths = build_sync_paths(self.path_context)
             result = OutputSyncBridge(sync_paths).sync_output_to_obsidian()
+        except ValueError as exc:
+            return ActionResult(
+                ok=False,
+                action="sync_to_obsidian",
+                message=str(exc),
+                files=[],
+                details={"path_context": self.path_context.to_dict()},
+            )
         except OSError as exc:
             return ActionResult(
                 ok=False,
@@ -105,6 +113,14 @@ class EasyModeFacade:
         try:
             sync_paths = build_sync_paths(self.path_context)
             result = OutputSyncBridge(sync_paths).sync_daily_logs_from_obsidian()
+        except ValueError as exc:
+            return ActionResult(
+                ok=False,
+                action="sync_daily_logs",
+                message=str(exc),
+                files=[],
+                details={"path_context": self.path_context.to_dict()},
+            )
         except OSError as exc:
             return ActionResult(
                 ok=False,

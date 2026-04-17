@@ -131,6 +131,8 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, object]:
             "review_plan_text": "",
             "review_prompt_text": "",
             "review_result_template_text": "",
+            "database_path": "",
+            "database_path_source": "",
         }
         vm["active_kind"] = "latest"
         vm["status_line"] = "Choose Daily or Review on the left to start."
@@ -143,12 +145,21 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, object]:
         details = json.dumps(result.details, ensure_ascii=False, indent=2, sort_keys=True)
 
     path_items: list[dict[str, str]] = []
-    if result.action == "get_current_paths" and isinstance(result.details, dict):
-        path_items = [
-            {"label": "Engine Workspace", "value": str(result.details.get("canonical_engine_repo", ""))},
-            {"label": "Notes Workspace", "value": str(result.details.get("notes_workspace", ""))},
-            {"label": "Database", "value": str(result.details.get("database_path", ""))},
-        ]
+    database_path = ""
+    database_path_source = ""
+    if isinstance(result.details, dict):
+        raw_path_context = result.details.get("path_context")
+        path_details = raw_path_context if isinstance(raw_path_context, dict) else result.details
+        database_path = str(path_details.get("database_path", ""))
+        database_path_source = str(path_details.get("database_path_source", ""))
+
+        if result.action == "get_current_paths":
+            path_items = [
+                {"label": "Engine Workspace", "value": str(path_details.get("canonical_engine_repo", ""))},
+                {"label": "Notes Workspace", "value": str(path_details.get("notes_workspace", ""))},
+                {"label": "Database", "value": database_path},
+                {"label": "Database Source", "value": database_path_source or "default"},
+            ]
 
     recent_daily_logs: list[str] = []
     recent_review_logs: list[str] = []
@@ -191,6 +202,8 @@ def build_result_viewmodel(result: ActionResult | None) -> dict[str, object]:
         "review_plan_text": review_plan_text,
         "review_prompt_text": review_prompt_text,
         "review_result_template_text": review_result_template_text,
+        "database_path": database_path,
+        "database_path_source": database_path_source or "default",
     }
     vm["review_workspace"] = _is_review_workspace(vm)
     vm["active_kind"] = _active_kind(vm)
@@ -212,6 +225,8 @@ def render_result_html(result: ActionResult | None) -> str:
     details = str(vm["details"])
     files = vm["files"]
     review_workspace = bool(vm["review_workspace"])
+    database_path = str(vm.get("database_path", ""))
+    database_path_source = str(vm.get("database_path_source", "default"))
 
     parts = ['<section class="shell-card work-panel" aria-labelledby="work-panel-title">']
     if review_workspace:
@@ -249,6 +264,12 @@ def render_result_html(result: ActionResult | None) -> str:
         parts.append('<h2 id="work-panel-title">Latest</h2>')
     parts.append(f'<p>{escape(str(vm["status_line"]))}</p>')
     parts.append('</div>')
+    if database_path:
+        parts.append('<div class="work-status-strip" aria-label="Database status">')
+        parts.append('<span class="work-status-strip__label">Active database</span>')
+        parts.append(f'<span class="work-status-strip__source">{escape(database_path_source)}</span>')
+        parts.append(f'<code class="work-status-strip__path">{escape(database_path)}</code>')
+        parts.append('</div>')
 
     if active_kind == "daily_prompt" and daily_prompt_text:
         parts.append('<div class="work-toolbar" aria-label="Output actions">')
